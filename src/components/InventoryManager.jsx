@@ -17,21 +17,21 @@ const InventoryManager = () => {
   const [quantity, setQuantity] = useState(0);
   const [unit, setUnit] = useState("units");
 
-  // Add a new product
+  // Agrega un nuevo producto de forma manual
   const handleAddProduct = () => {
-    if (!name) return;
+    if (!name.trim()) return;
     const newItem = {
       name,
       quantity: parseFloat(quantity) || 0,
       unit,
     };
-    setInventory([...inventory, newItem]);
+    setInventory((prev) => [...prev, newItem]);
     setName("");
     setQuantity(0);
     setUnit("units");
   };
 
-  // Download inventory as Excel
+  // Descarga el inventario como un archivo Excel
   const handleDownloadInventory = () => {
     if (inventory.length === 0) {
       alert("No inventory items to download.");
@@ -39,9 +39,9 @@ const InventoryManager = () => {
     }
     const workbook = XLSX.utils.book_new();
 
-    // Prepare data
+    // Crea la hoja con Name, Quantity, Unit
     const data = [
-      ["Name", "Quantity", "Unit"], // header row
+      ["Name", "Quantity", "Unit"], // encabezados
     ];
 
     inventory.forEach((item) => {
@@ -56,7 +56,7 @@ const InventoryManager = () => {
     saveAs(blob, "inventory.xlsx");
   };
 
-  // Upload inventory from Excel
+  // Carga el inventario desde un archivo Excel
   const handleUploadInventory = (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -69,11 +69,12 @@ const InventoryManager = () => {
       const sheet = wb.Sheets[sheetName];
       const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
 
-      // Expected format: [["Name","Quantity","Unit"], ["Pepsi", 20, "liters"], ...]
+      // Formato esperado:
+      // [["Name","Quantity","Unit"], ["Pepsi",20,"liters"], ...]
       const newInventory = [];
       for (let i = 1; i < jsonData.length; i++) {
         const row = jsonData[i];
-        if (row.length < 3) continue; // skip incomplete rows
+        if (row.length < 3) continue; // salta filas incompletas
         newInventory.push({
           name: row[0],
           quantity: parseFloat(row[1]) || 0,
@@ -81,9 +82,26 @@ const InventoryManager = () => {
         });
       }
       setInventory(newInventory);
-      e.target.value = null; // reset input
+      e.target.value = null; // Limpia el input file
     };
     reader.readAsArrayBuffer(file);
+  };
+
+  // Función para manejar cambios en la tabla editable
+  const handleInventoryChange = (index, key, value) => {
+    const updated = [...inventory];
+    // 'key' será "name", "quantity" o "unit"
+    if (key === "quantity") {
+      updated[index][key] = parseFloat(value) || 0;
+    } else {
+      updated[index][key] = value;
+    }
+    setInventory(updated);
+  };
+
+  // Elimina un producto de la tabla
+  const handleDelete = (index) => {
+    setInventory((prev) => prev.filter((_, i) => i !== index));
   };
 
   return (
@@ -113,7 +131,7 @@ const InventoryManager = () => {
           <option value="liters">liters</option>
           <option value="kg">kg</option>
           <option value="grams">grams</option>
-          {/* Add more as needed */}
+          {/* Agrega más según tus necesidades */}
         </select>
 
         <button className="btn" onClick={handleAddProduct}>
@@ -135,19 +153,54 @@ const InventoryManager = () => {
             <th style={{ border: "1px solid #ccc", padding: "8px" }}>Name</th>
             <th style={{ border: "1px solid #ccc", padding: "8px" }}>Quantity</th>
             <th style={{ border: "1px solid #ccc", padding: "8px" }}>Unit</th>
+            <th style={{ border: "1px solid #ccc", padding: "8px" }}>Action</th>
           </tr>
         </thead>
         <tbody>
           {inventory.map((item, index) => (
             <tr key={index}>
+              {/* Campo editable para Name */}
               <td style={{ border: "1px solid #ccc", padding: "8px" }}>
-                {item.name}
+                <input
+                  type="text"
+                  value={item.name}
+                  onChange={(e) => handleInventoryChange(index, "name", e.target.value)}
+                />
               </td>
+
+              {/* Campo editable para Quantity */}
               <td style={{ border: "1px solid #ccc", padding: "8px" }}>
-                {item.quantity}
+                <input
+                  type="number"
+                  value={item.quantity}
+                  onChange={(e) => handleInventoryChange(index, "quantity", e.target.value)}
+                  style={{ width: "80px" }}
+                />
               </td>
+
+              {/* Campo editable para Unit */}
               <td style={{ border: "1px solid #ccc", padding: "8px" }}>
-                {item.unit}
+                <select
+                  value={item.unit}
+                  onChange={(e) => handleInventoryChange(index, "unit", e.target.value)}
+                >
+                  <option value="units">units</option>
+                  <option value="liters">liters</option>
+                  <option value="kg">kg</option>
+                  <option value="grams">grams</option>
+                  {/* Más opciones si se desea */}
+                </select>
+              </td>
+
+              {/* Botón para eliminar la fila */}
+              <td style={{ border: "1px solid #ccc", padding: "8px" }}>
+                <button
+                  className="btn"
+                  style={{ backgroundColor: "#e76f51" }}
+                  onClick={() => handleDelete(index)}
+                >
+                  Delete
+                </button>
               </td>
             </tr>
           ))}
