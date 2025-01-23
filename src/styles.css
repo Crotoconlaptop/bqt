@@ -1,0 +1,81 @@
+/* Global resets and box-sizing */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  body {
+    font-family: sans-serif;
+    background-color: #f3f3f3;
+    color: #333;
+  }
+  
+  /* Container styles */
+  .container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1rem;
+  }
+  
+  /* Headings */
+  h1, h2, h3 {
+    margin-bottom: 0.5rem;
+  }
+  
+  /* Card or box style */
+  .box {
+    background: #fff;
+    padding: 1rem;
+    margin: 1rem 0;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+  }
+  
+  /* Buttons */
+  .btn {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    background-color: #2a9d8f;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-right: 0.5rem;
+  }
+  
+  .btn:hover {
+    background-color: #21867a;
+  }
+  
+  /* Inputs */
+  input[type="number"],
+  input[type="text"],
+  select {
+    width: 100%;
+    padding: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  /* Labels */
+  label {
+    display: inline-block;
+    margin-bottom: 0.3rem;
+    font-weight: 600;
+  }
+  
+  /* Checkboxes in a grid (example) */
+  .checklist {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* adjust as needed */
+    gap: 0.5rem;
+  }
+  
+  /* Responsive design for smaller screens */
+  @media (max-width: 600px) {
+    .checklist {
+      grid-template-columns: 1fr;
+    }
+  }
+  
